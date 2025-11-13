@@ -1,0 +1,48 @@
+project:
+  name: scene_generation
+  seed: 42
+
+paths:
+  data_root: ./data/coco2017
+  images_train: images/val2017
+  images_val: images/val2017
+  labels_train: labels/val2017  # 将训练集指向验证集，便于最小数据运行
+  labels_val: labels/val2017
+  checkpoints: ./checkpoints
+  outputs: ./outputs
+
+dataset:
+  name: coco2017
+  image_size: 256
+  cond_channels: 1  # 条件输入通道数；使用边缘条件时为1
+  condition_mode: depth_cv  # 条件来源：auto|label|edge|depth_cv|depth_midas
+  augment:
+    random_crop: true
+    random_flip: true
+    color_jitter: false
+
+download:
+  enabled: true
+  urls:
+    images_val_zip: https://images.cocodataset.org/zips/val2017.zip
+    # 最小数据运行：仅下载验证集，注释掉训练集和标注
+
+train:
+  epochs: 1
+  batch_size: 2
+  num_workers: 0
+  lr: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  lambda_recon: 100.0
+  lambda_depth: 0.5
+  save_every: 1
+
+model:
+  generator:
+    base_channels: 64
+    in_channels: 1
+    out_channels: 3
+  discriminator:
+    base_channels: 64
+    in_channels: 4  # 条件(1) + 图像(3)
